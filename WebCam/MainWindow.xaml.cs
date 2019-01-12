@@ -42,6 +42,7 @@ namespace WebCam
 
         private void ComboBoxWebcams_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            StopWebcam();
             StartWebcam();
         }
 
@@ -52,6 +53,16 @@ namespace WebCam
             webcam.NewFrame += new NewFrameEventHandler(webcam_NewFrame);
         }
 
+        private void StopWebcam()
+        {
+            if (webcam != null && webcam.IsRunning)
+            {
+                webcam.SignalToStop();
+                webcam.NewFrame -= new NewFrameEventHandler(webcam_NewFrame);
+                webcam = null;
+            }
+        }
+        
         private void webcam_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             this.Dispatcher.Invoke(() =>
@@ -92,12 +103,7 @@ namespace WebCam
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (webcam != null && webcam.IsRunning)
-            {
-                webcam.SignalToStop();
-                webcam.NewFrame -= new NewFrameEventHandler(webcam_NewFrame);
-                webcam = null;
-            }
+            StopWebcam();
         }
     }
 }
